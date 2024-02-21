@@ -2,7 +2,7 @@ const knex = require("../services/database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const register = async (req, res) => {
+const registUser = async (req, res) => {
     const { name, email, password } = req.body;
     try {
         const hashPass = await bcrypt.hash(password, 10);
@@ -72,7 +72,7 @@ const updateUser = async (req, res) => {
 };
 
 module.exports = {
-    register,
+    registUser,
     logIn,
     detailUser,
     updateUser,
