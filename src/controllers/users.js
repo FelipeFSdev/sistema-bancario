@@ -12,9 +12,7 @@ const registUser = async (req, res) => {
         return res.status(201).json({ message: `A new user has been resgistered.` });
 
     } catch (error) {
-        console.log(error.message);
-
-        return res.status(500).json({ message: "Internal server error." });
+        return res.status(500).json(error.message);
     };
 
 };
@@ -22,6 +20,9 @@ const registUser = async (req, res) => {
 const logIn = async (req, res) => {
     const { email, password } = req.body;
     try {
+        if (!email || !password) {
+            return res.status(401).json({ message: "Please inform email and password." });
+        };
         const account = await knex("users").where({ email }).first();
         if (!account) {
             return res.status(404).json({ message: "Account not found." });
@@ -37,8 +38,7 @@ const logIn = async (req, res) => {
         return res.status(200).json({ user: account.name, token });
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ message: "Internal server error." });
+        return res.status(500).json(error.message);
     };
 };
 
@@ -48,8 +48,7 @@ const detailUser = (req, res) => {
         return res.status(200).json(req.user);
 
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: "Internal server error." });
+        return res.status(500).json(error.message);
     };
 };
 
@@ -67,7 +66,7 @@ const updateUser = async (req, res) => {
         return res.status(204).json();
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error." });
+        return res.status(500).json(error.message);
     };
 };
 

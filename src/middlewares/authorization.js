@@ -4,8 +4,10 @@ const jwt = require("jsonwebtoken");
 const authorization = async (req, res, next) => {
     const { authorization } = req.headers;
     if (!authorization) {
-        return res.status(401).json({ message: "Invalid credentials." })
-    }
+        return res.status(401).json({
+            message: "Invalid credentials. Please inform your authentication token."
+        });
+    };
     const token = authorization.replace("Bearer ", "").trim();
 
     try {
@@ -19,7 +21,6 @@ const authorization = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.log(error.message)
         return res.status(401).json({ message: "Invalid credentials." });
     }
 }

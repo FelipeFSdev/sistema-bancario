@@ -8,16 +8,19 @@ const {
     deleteTransaction
 } = require("./controllers/transactions");
 const getExtract = require("./controllers/extract");
+const { bodyUserValidate, existingEmail } = require("./middlewares/userReqValidation");
+const bodyTransactionValidate = require("./middlewares/transactionReqValidation");
+const findCategoryById = require("./middlewares/findCategoryById");
 
 const routes = express();
 
-routes.post("/user", registUser);
+routes.post("/user", bodyUserValidate, registUser);
 routes.post("/login", logIn);
 
 routes.use(authorization);
 
 routes.get("/user", detailUser);
-routes.put("/user", updateUser);
+routes.put("/user", bodyUserValidate, existingEmail, updateUser);
 
 routes.get("/category", listCategories);
 
@@ -25,8 +28,8 @@ routes.get("/transaction/extract", getExtract);
 
 routes.get("/transaction", listUserTransactions);
 routes.get("/transaction/:id", detailTransaction);
-routes.post("/transaction", registTransaction);
-routes.put("/transaction/:id", updateTransaction);
+routes.post("/transaction", bodyTransactionValidate, findCategoryById, registTransaction);
+routes.put("/transaction/:id", bodyTransactionValidate, findCategoryById, updateTransaction);
 routes.delete("/transaction/:id", deleteTransaction);
 
 

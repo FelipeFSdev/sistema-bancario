@@ -12,11 +12,12 @@ const getExtract = async (req, res) => {
             .where({ users_id: id, type: "withdraw" })
             .sum("value")
             .first();
+        const newValue = deposits.sum - withdraw.sum;
 
         return res.status(200).json({
             deposits: (deposits.sum),
             withdraw: (withdraw.sum),
-            remaining_value: deposits.sum - withdraw.sum,
+            remaining_value: newValue,
         });
 
     } catch (error) {

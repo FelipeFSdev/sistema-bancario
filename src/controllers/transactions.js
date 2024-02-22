@@ -1,8 +1,20 @@
 const knex = require("../services/database");
 
 const listUserTransactions = async (req, res) => {
+    const { categoryId } = req.query;
     const { id } = req.user;
     try {
+        if (categoryId) {
+            const transactions = await knex("transactions")
+                .where({ users_id: id, category_id: categoryId });
+
+            if (transactions.length < 1) {
+                return res.status(200).json({
+                    message: "This account has no transactions from the indicated category."
+                });
+            };
+            return res.status(200).json(transactions);
+        };
         const transactions = await knex("transactions")
             .where({ users_id: id });
         if (transactions.length < 1) {
@@ -12,7 +24,6 @@ const listUserTransactions = async (req, res) => {
         return res.status(200).json(transactions);
 
     } catch (error) {
-        console.log("Erro no list")
         return res.status(500).json(error.message);
     };
 };
@@ -30,7 +41,6 @@ const detailTransaction = async (req, res) => {
         return res.status(200).json(transaction);
 
     } catch (error) {
-        console.log("Erro no detail")
         return res.status(500).json(error.message);
     };
 };
@@ -54,7 +64,6 @@ const registTransaction = async (req, res) => {
         return res.status(201).json(newTransaction);
 
     } catch (error) {
-        console.log("Erro no regist")
         return res.status(500).json(error.message);
     };
 };
@@ -65,7 +74,7 @@ const updateTransaction = async (req, res) => {
     const { description, value, category_id, type } = req.body;
     const dateTimeStamp = new Date();
     try {
-        await knex("transactions")
+        const transaction = await knex("transactions")
             .where({ users_id: userId, id })
             .update({
                 description,
@@ -76,11 +85,13 @@ const updateTransaction = async (req, res) => {
                 users_id: userId
             })
             .returning("*");
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not found." });
+        };
 
         return res.status(204).json();
 
     } catch (error) {
-        console.log("Erro no update")
         return res.status(500).json(error.message);
     };
 };
@@ -89,15 +100,18 @@ const deleteTransaction = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
     try {
-        await knex("transactions")
+        const transaction = await knex("transactions")
             .where({ users_id: userId, id })
             .delete()
             .returning("*");
 
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not found." });
+        };
+
         return res.status(204).json();
 
     } catch (error) {
-        console.log("Erro no delete")
         return res.status(500).json(error.message);
     };
 };
